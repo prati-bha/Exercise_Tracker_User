@@ -3,48 +3,68 @@ const validate = require('validator');
 const User = require('../models/user.model');
 const auth = require('../middlewares/auth')
 
-router.route('/').get((req, res) => {
-    User.find()
-        .then(users => res.json(users))
-        .catch(err => res.status(400).json('Error: ' + err));
-});
-const sendResponse = (isUnique, res) => {
-    if (isUnique) {
-        res.status(200).send({
-            message: "username can be taken !"
-        });
-    }
+/**Check Unique Username */
+
+const sendResponse = (isUnique, res, req) => {
     if (!isUnique) {
         res.status(405).send({
-            message: "username already taken"
+            message: "username already taken !"
         });
     }
+    if (isUnique) {
+        if (req.method === 'GET') {
+            res.status(200).send({
+                message: "username can be taken !"
+            });
+        }
+        if (req.method === 'POST') {
+            User.updateOne(req.user, { username: req.body.username }, {}, (err, data) => {
+                if (err) {
+                    res.status(400).json('Error: ' + err)
+                }
+                res.json({
+                    message: "username added!"
+                })
+            })
+        }
+    }
 }
-const checkUniqueNess = (usernameToCheck, users, res) => {
-    if (usernameToCheck === undefined) {
+const checkUniqueNess = (username, res, req) => {
+    if (username === undefined) {
         res.status(400).send({
-            message: 'username required'
+            message: 'username required !'
         });
     }
-    if (usernameToCheck !== undefined) {
-        const usedUsernames = users.filter((user) => {
-            if (user.username && usernameToCheck.toLowerCase() === user.username.toLowerCase()) {
-                return user
+    if (username !== undefined) {
+        User.find({ username }).countDocuments((err, count) => {
+            if (err) {
+                res.status(500);
             }
-        });
-        sendResponse(!(usedUsernames.length > 0), res);
+            if (req.method === 'GET') {
+                sendResponse(!(count > 0), res, req);
+            }
+            if (req.method === 'POST') {
+                sendResponse(!(count > 0), res, req);
+            }
+        })
     }
 }
-router.route('/username').get((req, res) => {
-    const username = req.query.username;
-    User.find()
-        .then(users => {
-            checkUniqueNess(username, users, res);
-        })
-        .catch(err => res.status(400).json('Error: ' + err));
-});
 
-//signUp api
+router.get('/username', auth, ((req, res) => {
+    const username = req.query.username;
+    try {
+        checkUniqueNess(username, res, req);
+    } catch (error) {
+        res.status(404).send({
+            message: error
+        })
+    }
+}));
+
+/**Check Unique Username */
+
+
+/**Sign Up Api */
 router.route('/signUp').post(async (req, res) => {
     try {
         const email = req.body.email;
@@ -64,7 +84,7 @@ router.route('/signUp').post(async (req, res) => {
 
 });
 
-//login api
+/** Login Api */
 router.route('/login').post(async (req, res) => {
     try {
         const user = await User.findByCredentials(req.body.email, req.body.password)
@@ -79,22 +99,24 @@ router.route('/login').post(async (req, res) => {
 
 });
 
-router.route('/add').post((req, res) => {
+/**Add Username Api */
+router.post('/username', auth, (req, res) => {
     const username = req.body.username;
-    if (username.length > 8) {
+    if (username && username.length > 8) {
         res.status(400).send({
             message: "Allowed username's length is only 8"
         })
-    } else if (!validate.isAlphanumeric(username, 'en-US')) {
+    } else if (username && !validate.isAlphanumeric(username, 'en-US')) {
         res.status(400).send({
             message: "Allowed username's content should be alphanumeric only"
         })
     }
-    else {
-        const newUser = new User({ username });
-        newUser.save()
-            .then(() => res.json('User added!'))
-            .catch(err => res.status(400).json('Error: ' + err));
+    try {
+        checkUniqueNess(username, res, req)
+    } catch (error) {
+        res.status(400).send({
+            message: error
+        })
     }
 });
 
