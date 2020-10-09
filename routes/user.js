@@ -28,7 +28,7 @@ const checkUniqueNess = (usernameToCheck, users, res) => {
     }
     if (usernameToCheck !== undefined) {
         const usedUsernames = users.filter((user) => {
-            if (usernameToCheck.toLowerCase() === user.username.toLowerCase()) {
+            if (user.username && usernameToCheck.toLowerCase() === user.username.toLowerCase()) {
                 return user
             }
         });
