@@ -15,6 +15,7 @@ import {
   TextField,
 } from "@material-ui/core";
 import moment from "moment";
+import CustomizedDialogs from "./Modal/Modal";
 
 toast.configure();
 class EditExercise extends Component {
@@ -36,10 +37,16 @@ class EditExercise extends Component {
       validMinutes: true,
       validDescLength: true,
       errorMessage: "",
+      hasUsername: true,
     };
   }
 
   componentDidMount() {
+    if (localStorage.getItem("username") === null) {
+      this.setState({
+        hasUsername: false,
+      });
+    }
     axios
       .get(`${ENDPOINTS.EXERCISES}/${this.props.match.params.id}`)
       .then((response) => {
@@ -136,6 +143,9 @@ class EditExercise extends Component {
   }
 
   render() {
+    if (!this.state.hasUsername) {
+      return <CustomizedDialogs open />;
+    }
     return (
       <div className="exercise-container">
         <h3>Edit Exercise Log</h3>

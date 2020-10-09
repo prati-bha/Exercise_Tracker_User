@@ -15,6 +15,9 @@ import {
   TextField,
 } from "@material-ui/core";
 import moment from "moment";
+import Modal from "./Modal/Modal";
+import CustomizedDialogs from "./Modal/Modal";
+
 toast.configure();
 class CreateExercise extends Component {
   constructor(props) {
@@ -33,9 +36,16 @@ class CreateExercise extends Component {
       validMinutes: true,
       validDescLength: true,
       errorMessage: "",
+      hasUsername: true,
     };
   }
   componentDidMount() {
+    if (localStorage.getItem("username") === null) {
+      this.setState({
+        hasUsername: false,
+      });
+    }
+
     axios
       .get(ENDPOINTS.USERS)
       .then((response) => {
@@ -107,8 +117,12 @@ class CreateExercise extends Component {
     });
   }
   render() {
+    if (!this.state.hasUsername) {
+      return <CustomizedDialogs open />;
+    }
     return (
       <div className="exercise-container">
+        <Modal show></Modal>
         <h3>Create New Exercise Log</h3>
         <form onSubmit={this.onSubmit}>
           <div className="form-group">
