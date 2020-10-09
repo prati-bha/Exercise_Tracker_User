@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const validate = require('validator');
-let User = require('../models/user.model');
+const User = require('../models/user.model');
+const auth = require('../middlewares/auth')
 
 router.route('/').get((req, res) => {
     User.find()
@@ -41,6 +42,41 @@ router.route('/username').get((req, res) => {
             checkUniqueNess(username, users, res);
         })
         .catch(err => res.status(400).json('Error: ' + err));
+});
+
+//signUp api
+router.route('/signUp').post(async (req, res) => {
+    try {
+        const email = req.body.email;
+        const password = req.body.password;
+        const user = new User({
+            email,
+            password,
+        });
+        user.save().then(() => {
+            res.status(200).send({
+                user,
+            })
+        }).catch(err => res.status(400).json('Error: ' + err));
+    } catch (error) {
+        res.status(500).json('Error: ' + error)
+    }
+
+});
+
+//login api
+router.route('/login').post(async (req, res) => {
+    try {
+        const user = await User.findByCredentials(req.body.email, req.body.password)
+        const token = await user.generateAuthToken();
+        res.status(200).send({
+            user,
+            token
+        })
+    } catch (error) {
+        res.status(500).json('Error: ' + error)
+    }
+
 });
 
 router.route('/add').post((req, res) => {
