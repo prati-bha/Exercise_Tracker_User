@@ -50,10 +50,17 @@ export class Login extends Component {
       password: this.state.password,
     };
 
-    localStorage.setItem("token", "1234");
+    // localStorage.setItem("token", "1234");
     //TODO add endpoint for login
     // axios.post(`${ENDPOINTS.EXERCISES}/${id}`).then((response) => {
     //   localStorage.setItem("token", response.data.token);
+    // if (Response.data.user.username) {
+    //   localStorage.setItem("username", response.data.username);
+    //   this.notify("Logged In Successfully!");
+    //   history.push("/");
+    // }else{
+    //   history.push("/user");
+    // }
     // });
   }
 

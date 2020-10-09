@@ -12,17 +12,20 @@ export class Signup extends Component {
     this.onChangeName = this.onChangeName.bind(this);
     this.onChangeEmail = this.onChangeEmail.bind(this);
     this.onChangePassword = this.onChangePassword.bind(this);
+    this.onChangeConfirmPassword = this.onChangeConfirmPassword.bind(this);
 
     this.state = {
       username: "",
       email: "",
       password: "",
+      confirmPassword: "",
       error: false,
       errorMessage: {
         username: "",
         email: "",
       },
       uniqueUsername: false,
+      matchPassword: true,
     };
   }
 
@@ -98,7 +101,25 @@ export class Signup extends Component {
   onChangePassword(e) {
     this.setState({
       password: e.target.value,
+      matchPassword: true,
     });
+    if (e.target.value && e.target.value !== this.state.confirmPassword) {
+      this.setState({
+        matchPassword: false,
+      });
+    }
+  }
+
+  onChangeConfirmPassword(e) {
+    this.setState({
+      confirmPassword: e.target.value,
+      matchPassword: true,
+    });
+    if (e.target.value && e.target.value !== this.state.password) {
+      this.setState({
+        matchPassword: false,
+      });
+    }
   }
 
   onSubmit(e) {
@@ -114,21 +135,21 @@ export class Signup extends Component {
     // TODO add sign up api endpoint
     // axios.post(ENDPOINTS.ADD_USER, user).then((res) => {
     //   this.notify("Signed Up Successfully!");
-    //   history.push("/");
+    //   history.push("/login");
     //   return console.log(res.data);
     // });
 
-    // this.setState({
-    //   username: "",
-    //   email: "",
-    //   password: "",
-    //   error: false,
-    //   errorMessage: {
-    //     username: "",
-    //     email: "",
-    //   },
-    //   uniqueUsername: false,
-    // });
+    this.setState({
+      email: "",
+      password: "",
+      error: false,
+      errorMessage: {
+        username: "",
+        email: "",
+      },
+      uniqueUsername: false,
+      matchPassword: true,
+    });
   }
 
   render() {
@@ -168,14 +189,18 @@ export class Signup extends Component {
           </div>
           <div className="form-group">
             <TextField
+              error={!this.state.matchPassword}
+              helperText={
+                !this.state.matchPassword ? "Password does not match" : null
+              }
               variant="outlined"
               required
               id="standard-required-confirm"
-              label="Password"
+              label="Confirm Password"
               type="password"
-              placeholder="Enter Password"
-              value={this.state.password}
-              onChange={this.onChangePassword}
+              placeholder="Enter Confirm Password"
+              value={this.state.confirmPassword}
+              onChange={this.onChangeConfirmPassword}
             />
           </div>
           <div className="form-group">
@@ -185,10 +210,10 @@ export class Signup extends Component {
               className="btn btn-primary"
               disabled={
                 !this.state.email ||
-                !this.state.username ||
                 !this.state.password ||
+                !this.state.confirmPassword ||
                 this.state.error ||
-                this.state.validUsername
+                !this.state.matchPassword
               }
             />
           </div>
