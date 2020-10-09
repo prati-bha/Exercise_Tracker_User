@@ -96,7 +96,6 @@ export default class CreateUser extends Component {
         <form onSubmit={this.onSubmit}>
           <div className="form-group">
             <TextField
-              
               variant="outlined"
               error={
                 this.state.error ||
