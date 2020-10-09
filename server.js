@@ -6,7 +6,7 @@ const exerciseRoute = require('./routes/exercises');
 const userRoute = require('./routes/user')
 require('dotenv').config();
 const uri = process.env.ATLAS_URI;
-mongoose.connect(uri, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true })
+mongoose.connect(uri, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true, useFindAndModify: true })
 const connection = mongoose.connection;
 connection.once('open', () => {
     console.log("Mongodb connection established")

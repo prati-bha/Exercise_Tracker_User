@@ -99,6 +99,25 @@ router.route('/login').post(async (req, res) => {
 
 });
 
+/** Logout Api */
+router.get('/logout', auth, async (req, res) => {
+    try {
+        User.updateOne(req.user, {
+            tokens: req.user.tokens.filter((token) => token.token !== req.token)
+        }, (err, data) => {
+            if (err) {
+                res.status(500).json('Error: ' + err)
+            }
+            if (!err) {
+                res.status(200).send({
+                    message: "user logged out !"
+                })
+            }
+        })
+    } catch (error) {
+        res.status(500).json('Error: ' + error)
+    }
+});
 /**Add Username Api */
 router.post('/username', auth, (req, res) => {
     const username = req.body.username;
