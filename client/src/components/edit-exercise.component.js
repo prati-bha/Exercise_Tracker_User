@@ -5,7 +5,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { withRouter } from "react-router-dom";
-import { ENDPOINTS } from "../constant";
+import { ENDPOINTS, getToken } from "../constant";
 import {
   FormControl,
   FormHelperText,
@@ -48,7 +48,9 @@ class EditExercise extends Component {
       });
     }
     axios
-      .get(`${ENDPOINTS.EXERCISES}/${this.props.match.params.id}`)
+      .get(`${ENDPOINTS.EXERCISES}/${this.props.match.params.id}`, {
+        headers: getToken,
+      })
       .then((response) => {
         this.setState({
           username: response.data.username,
@@ -63,7 +65,9 @@ class EditExercise extends Component {
       });
 
     axios
-      .get(ENDPOINTS.USERS)
+      .get(ENDPOINTS.USERS, {
+        headers: getToken,
+      })
       .then((response) => {
         if (response.data.length > 0) {
           this.setState({
@@ -134,7 +138,9 @@ class EditExercise extends Component {
     console.log(exercise);
 
     axios
-      .post(ENDPOINTS.UPDATE_EXERCISE + this.props.match.params.id, exercise)
+      .post(ENDPOINTS.UPDATE_EXERCISE + this.props.match.params.id, exercise, {
+        headers: getToken,
+      })
       .then((res) => {
         this.notify("Exercise Updated!");
         history.push("/");

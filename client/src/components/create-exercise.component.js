@@ -5,7 +5,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { withRouter } from "react-router-dom";
-import { ENDPOINTS } from "../constant";
+import { ENDPOINTS, getToken } from "../constant";
 import {
   FormControl,
   FormHelperText,
@@ -47,7 +47,9 @@ class CreateExercise extends Component {
     }
 
     axios
-      .get(ENDPOINTS.USERS)
+      .get(ENDPOINTS.USERS, {
+        headers: getToken,
+      })
       .then((response) => {
         if (response.data.length > 0) {
           this.setState({
@@ -110,11 +112,15 @@ class CreateExercise extends Component {
       date: this.state.date,
     };
     console.log(exercise);
-    axios.post(ENDPOINTS.ADD_EXERCISE, exercise).then((res) => {
-      this.notify("Exercise Added!");
-      history.push("/");
-      return console.log(res.data);
-    });
+    axios
+      .post(ENDPOINTS.ADD_EXERCISE, exercise, {
+        headers: getToken,
+      })
+      .then((res) => {
+        this.notify("Exercise Added!");
+        history.push("/");
+        return console.log(res.data);
+      });
   }
   render() {
     if (!this.state.hasUsername) {

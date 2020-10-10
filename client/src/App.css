@@ -114,3 +114,36 @@
   margin: auto;
   margin-bottom: 15px;
 }
+
+.stepper-container {
+  width: 90%;
+  height: auto;
+  margin: auto;
+  padding: 30px 0px;
+  background-color: #efefef;
+  border-radius: 10px;
+}
+
+.profile-picture-container {
+  margin-bottom: 10px;
+}
+
+.profile-picture-container img {
+  max-height: 100px;
+  max-width: 100px;
+  border-radius: 50%;
+}
+
+.nav-img {
+  max-height: 30px;
+  max-width: 30px;
+  border-radius: 50%;
+}
+
+.nav-btn {
+  border: none;
+}
+
+.nav-btn:focus {
+  border: none;
+}

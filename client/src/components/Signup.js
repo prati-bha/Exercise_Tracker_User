@@ -3,7 +3,9 @@ import React, { Component } from "react";
 import validator from "validator";
 import axios from "axios";
 import { ENDPOINTS } from "../constant";
+import { toast } from "react-toastify";
 
+toast.configure();
 export class Signup extends Component {
   constructor(props) {
     super(props);
@@ -121,27 +123,30 @@ export class Signup extends Component {
       });
     }
   }
+  notify(e) {
+    return toast.success(e, { position: toast.POSITION.TOP_RIGHT });
+  }
 
   onSubmit(e) {
     const { history } = this.props;
     e.preventDefault();
 
     const user = {
-      username: this.state.username,
       email: this.state.email,
       password: this.state.password,
     };
 
     // TODO add sign up api endpoint
-    // axios.post(ENDPOINTS.ADD_USER, user).then((res) => {
-    //   this.notify("Signed Up Successfully!");
-    //   history.push("/login");
-    //   return console.log(res.data);
-    // });
+    axios.post(ENDPOINTS.SIGN_UP, user).then((res) => {
+      this.notify("Signed Up Successfully!");
+      history.push("/login");
+      return console.log(res.data);
+    });
 
     this.setState({
       email: "",
       password: "",
+      confirmPassword: "",
       error: false,
       errorMessage: {
         username: "",
