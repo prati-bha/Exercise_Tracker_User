@@ -36,14 +36,11 @@ const checkUniqueNess = (username, res, req) => {
         });
     }
     if (username !== undefined) {
-        User.find({ username }).countDocuments((err, count) => {
+        User.find({ "username": { $regex: username, $options: 'i' } }).countDocuments((err, count) => {
             if (err) {
                 res.status(500);
             }
-            if (req.method === 'GET') {
-                sendResponse(!(count > 0), res, req);
-            }
-            if (req.method === 'POST') {
+            if (!err) {
                 sendResponse(!(count > 0), res, req);
             }
         })
