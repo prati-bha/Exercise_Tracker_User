@@ -1,20 +1,22 @@
 const router = require('express').Router();
 let Exercise = require('../models/exercise.model');
+const auth = require('../middlewares/auth')
 let User = require('../models/user.model');
 
 const isUserAlreadyAvailable = async (username) => {
     let isUsernameAvailable = false;
-    await User.find({ "username": username }, (err, users) => {
-        if (users && users.length > 0) {
-            isUsernameAvailable = true
-        } else {
-            isUsernameAvailable = false
+    await User.find({ "username": { $regex: username, $options: 'i' } }).countDocuments((err, count) => {
+        if (err) {
+            res.status(500);
+        }
+        if (!err) {
+            isUsernameAvailable = count > 0;
         }
     });
     return isUsernameAvailable
 }
 
-router.route('/').get((req, res) => {
+router.get('/', auth, (req, res) => {
     let skip;
     const { limit, pageNum } = req.query;
     let limitNumeric;
@@ -28,7 +30,7 @@ router.route('/').get((req, res) => {
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
-router.route('/add').post((req, res) => {
+router.post('/add', auth, (req, res) => {
     const username = req.body.username;
     const description = req.body.description;
     const duration = Number(req.body.duration);
@@ -54,21 +56,21 @@ router.route('/add').post((req, res) => {
             })
         }
     })
-
 })
-router.route('/:id').get((req, res) => {
+
+router.get('/:id', auth, (req, res) => {
     Exercise.findById(req.params.id)
         .then(exercise => res.json(exercise))
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
-router.route('/:id').delete((req, res) => {
+router.delete('/:id', auth, (req, res) => {
     Exercise.findByIdAndDelete(req.params.id)
         .then(() => res.json('Exercise deleted.'))
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
-router.route('/update/:id').post((req, res) => {
+router.post('/update/:id', auth, (req, res) => {
     Exercise.findById(req.params.id)
         .then(exercise => {
             exercise.username = req.body.username;
