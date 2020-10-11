@@ -3,7 +3,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { TextField } from "@material-ui/core";
-import { ENDPOINTS } from "../constant";
+import { ENDPOINTS, getToken } from "../constant";
 import "../App.css";
 import validator from "validator";
 
@@ -55,7 +55,9 @@ export default class CreateUser extends Component {
       });
     }
     axios
-      .get(`${ENDPOINTS.CHECK_USERNAME}?username=${e.target.value}`)
+      .get(`${ENDPOINTS.CHECK_USERNAME}?username=${e.target.value}`, {
+        headers: getToken,
+      })
       .then((res) => this.setState({ error: false, unique: true }))
       .catch((err) =>
         this.setState({
@@ -76,11 +78,15 @@ export default class CreateUser extends Component {
 
     console.log(user);
 
-    axios.post(ENDPOINTS.ADD_USER, user).then((res) => {
-      this.notify("User Added!");
-      history.push("/create");
-      return console.log(res.data);
-    });
+    axios
+      .post(ENDPOINTS.ADD_USER, user, {
+        headers: getToken,
+      })
+      .then((res) => {
+        this.notify("User Added!");
+        history.push("/create");
+        return console.log(res.data);
+      });
 
     this.setState({
       username: "",

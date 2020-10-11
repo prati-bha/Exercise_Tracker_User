@@ -17,6 +17,7 @@ import CreateUser from "./components/create-user.component";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
 import NotFound from "./components/404/NotFound";
+import Profile from "./components/User/Profile";
 
 //Lazy load components
 // const EditExercise = React.lazy(() =>
@@ -91,6 +92,23 @@ function App() {
                 <Redirect to="/login" />
               ) : (
                 <CreateUser />
+              )
+            }
+
+            // component={CreateUser}
+            // render={() => (
+            //   <Suspense fallback={() => <div>Loading...</div>}>
+            //     <CreateUser />
+            //   </Suspense>
+            // )}
+          />
+          <Route
+            path="/profile"
+            render={() =>
+              localStorage.getItem("token") === null ? (
+                <Redirect to="/login" />
+              ) : (
+                <Profile />
               )
             }
 

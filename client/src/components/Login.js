@@ -1,6 +1,11 @@
 import { TextField } from "@material-ui/core";
 import React, { Component } from "react";
 import validator from "validator";
+import axios from "axios";
+import { ENDPOINTS } from "../constant";
+import { toast } from "react-toastify";
+
+toast.configure();
 
 export class Login extends Component {
   constructor(props) {
@@ -41,6 +46,10 @@ export class Login extends Component {
     });
   }
 
+  notify(e) {
+    return toast.success(e, { position: toast.POSITION.TOP_RIGHT });
+  }
+
   onSubmit(e) {
     const { history } = this.props;
     e.preventDefault();
@@ -50,18 +59,18 @@ export class Login extends Component {
       password: this.state.password,
     };
 
-    // localStorage.setItem("token", "1234");
-    //TODO add endpoint for login
-    // axios.post(`${ENDPOINTS.EXERCISES}/${id}`).then((response) => {
-    //   localStorage.setItem("token", response.data.token);
-    // if (Response.data.user.username) {
-    //   localStorage.setItem("username", response.data.username);
-    //   this.notify("Logged In Successfully!");
-    //   history.push("/");
-    // }else{
-    //   history.push("/user");
-    // }
-    // });
+    // TODO add endpoint for login
+    axios.post(`${ENDPOINTS.LOGIN}`, user).then((response) => {
+      console.log('response', response.data)
+      localStorage.setItem("token", response.data.token);
+      if (response.data.user.username) {
+        localStorage.setItem("username", response.data.username);
+        this.notify("Logged In Successfully!");
+        history.push("/");
+      } else {
+        history.push("/user");
+      }
+    });
   }
 
   render() {
