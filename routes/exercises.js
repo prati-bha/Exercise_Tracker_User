@@ -80,7 +80,7 @@ router.post('/add', auth, (req, res) => {
 })
 
 router.get('/:id', auth, (req, res) => {
-    const isUsernameAdded = checkUsername(username);
+    const isUsernameAdded = checkUsername(req.user.username);
     if (isUsernameAdded) {
         Exercise.findById(req.params.id)
             .then(exercise => res.json(exercise))
@@ -93,7 +93,7 @@ router.get('/:id', auth, (req, res) => {
 });
 
 router.delete('/:id', auth, (req, res) => {
-    const isUsernameAdded = checkUsername(username);
+    const isUsernameAdded = checkUsername(req.user.username);
     if (isUsernameAdded) {
         Exercise.findByIdAndDelete(req.params.id)
             .then(() => res.json('Exercise deleted.'))
@@ -106,15 +106,13 @@ router.delete('/:id', auth, (req, res) => {
 });
 
 router.post('/update/:id', auth, (req, res) => {
-    const isUsernameAdded = checkUsername(username);
+    const isUsernameAdded = checkUsername(req.user.username);
     if (isUsernameAdded) {
         Exercise.findById(req.params.id)
             .then(exercise => {
-                exercise.username = req.body.username;
-                exercise.description = req.body.description;
-                exercise.duration = Number(req.body.duration);
-                exercise.date = Date.parse(req.body.date);
-
+                req.body.description && (exercise.description = req.body.description);
+                req.body.duration && (exercise.duration = Number(req.body.duration));
+                req.body.date && (exercise.date = Date.parse(req.body.date));
                 exercise.save()
                     .then(() => res.json('Exercise updated!'))
                     .catch(err => res.status(400).json('Error: ' + err));
