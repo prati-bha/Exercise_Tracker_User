@@ -30,6 +30,10 @@ const userSchema = new Schema({
             }
         }
     },
+    username: {
+        type: String,
+        trim: true
+    },
     tokens: [{
         token: {
             type: String,
@@ -38,7 +42,6 @@ const userSchema = new Schema({
     }]
 }, {
     timestamps: true,
-    strict: false
 });
 
 userSchema.methods.toJSON = function () {

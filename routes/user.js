@@ -5,7 +5,7 @@ const auth = require('../middlewares/auth')
 
 /**Check Unique Username */
 
-const sendResponse = (isUnique, res, req) => {
+const sendResponse = async (isUnique, res, req) => {
     if (!isUnique) {
         res.status(405).send({
             message: "username already taken !"
@@ -18,7 +18,7 @@ const sendResponse = (isUnique, res, req) => {
             });
         }
         if (req.method === 'POST') {
-            User.updateOne(req.user, { username: req.body.username }, {}, (err, data) => {
+            await User.updateOne(req.user, { username: req.body.username }, {}, (err, data) => {
                 if (err) {
                     res.status(400).json('Error: ' + err)
                 }
@@ -29,14 +29,14 @@ const sendResponse = (isUnique, res, req) => {
         }
     }
 }
-const checkUniqueNess = (username, res, req) => {
+const checkUniqueNess = async (username, res, req) => {
     if (username === undefined) {
         res.status(400).send({
             message: 'username required !'
         });
     }
     if (username !== undefined) {
-        User.find({ "username": { $regex: username, $options: 'i' } }).countDocuments((err, count) => {
+        await User.find({ "username": { $regex: username, $options: 'i' } }).countDocuments((err, count) => {
             if (err) {
                 res.status(500);
             }
@@ -99,7 +99,7 @@ router.route('/login').post(async (req, res) => {
 /** Logout Api */
 router.get('/logout', auth, async (req, res) => {
     try {
-        User.updateOne(req.user, {
+        await User.updateOne(req.user, {
             tokens: req.user.tokens.filter((token) => token.token !== req.token)
         }, (err, data) => {
             if (err) {
@@ -135,5 +135,6 @@ router.post('/username', auth, (req, res) => {
         })
     }
 });
+/**Add Username Api */
 
 module.exports = router;

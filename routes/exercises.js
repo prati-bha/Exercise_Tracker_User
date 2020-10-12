@@ -16,8 +16,9 @@ const isUserAlreadyAvailable = async (username) => {
     return isUsernameAvailable
 }
 
-router.get('/', auth, (req, res) => {
+router.get('/', auth, async (req, res) => {
     let skip;
+    const { username } = req.user;
     const { limit, pageNum } = req.query;
     let limitNumeric;
     if (limit && pageNum) {
@@ -25,7 +26,7 @@ router.get('/', auth, (req, res) => {
         limitNumeric = parseInt(limit);
     }
 
-    Exercise.find().skip(skip).limit(limitNumeric).sort({ createdAt: -1 })
+    Exercise.find({ username }).skip(skip).limit(limitNumeric).sort({ createdAt: -1 })
         .then(exercises => res.json(exercises))
         .catch(err => res.status(400).json('Error: ' + err));
 });
