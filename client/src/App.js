@@ -40,11 +40,11 @@ function App() {
         <br />
         <Switch>
           <Route
-            path="/"
+            path="/list"
             exact
             render={() =>
               localStorage.getItem("token") === null ? (
-                <Redirect to="/login" />
+                <Redirect to="/" />
               ) : (
                 <ExercisesList />
               )
@@ -55,7 +55,7 @@ function App() {
             path="/edit/:id"
             render={() =>
               localStorage.getItem("token") === null ? (
-                <Redirect to="/login" />
+                <Redirect to="/" />
               ) : (
                 <EditExercise />
               )
@@ -72,7 +72,7 @@ function App() {
             path="/create"
             render={() =>
               localStorage.getItem("token") === null ? (
-                <Redirect to="/login" />
+                <Redirect to="/" />
               ) : (
                 <CreateExercise />
               )
@@ -89,7 +89,7 @@ function App() {
             path="/user"
             render={() =>
               localStorage.getItem("token") === null ? (
-                <Redirect to="/login" />
+                <Redirect to="/" />
               ) : (
                 <CreateUser />
               )
@@ -106,7 +106,7 @@ function App() {
             path="/profile"
             render={() =>
               localStorage.getItem("token") === null ? (
-                <Redirect to="/login" />
+                <Redirect to="/" />
               ) : (
                 <Profile />
               )
@@ -120,7 +120,7 @@ function App() {
             // )}
           />
 
-          <Route path="/login" component={Login} />
+          <Route path="/" component={Login} exact />
           <Route path="/signUp" component={Signup} />
           <Route component={NotFound} />
         </Switch>

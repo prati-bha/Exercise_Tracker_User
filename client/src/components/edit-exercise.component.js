@@ -52,17 +52,18 @@ class EditExercise extends Component {
         headers: getToken,
       })
       .then((response) => {
-        this.setState({
-          username: response.data.username,
-          description: response.data.description,
-          duration: response.data.duration,
-          date: moment(response.data.date).format("YYYY-MM-DD"),
-        });
+        setTimeout(() => {
+          this.setState({
+            username: response.data.username,
+            description: response.data.description,
+            duration: response.data.duration,
+            date: moment(response.data.date).format("YYYY-MM-DD"),
+          });
+        }, 0);
+
         console.log(this.state);
       })
-      .catch(function (error) {
-        console.log(error);
-      });
+      .catch((err) => this.notify(err));
 
     axios
       .get(ENDPOINTS.USERS, {
@@ -75,9 +76,7 @@ class EditExercise extends Component {
           });
         }
       })
-      .catch((error) => {
-        console.log(error);
-      });
+      .catch((err) => this.notify(err));
   }
 
   onChangeUsername(e) {
@@ -143,9 +142,10 @@ class EditExercise extends Component {
       })
       .then((res) => {
         this.notify("Exercise Updated!");
-        history.push("/");
+        history.push("/list");
         return console.log(res.data);
-      });
+      })
+      .catch((err) => this.notify(err));
   }
 
   render() {
@@ -156,29 +156,6 @@ class EditExercise extends Component {
       <div className="exercise-container">
         <h3>Edit Exercise Log</h3>
         <form onSubmit={this.onSubmit}>
-          <div className="form-group">
-            <FormControl variant="outlined">
-              <InputLabel id="demo-simple-select-outlined-label">
-                Username
-              </InputLabel>
-              <Select
-                labelId="demo-simple-select-outlined-label"
-                id="demo-simple-select-outlined"
-                label="Username"
-                value={this.state.username}
-                onChange={this.onChangeUsername}
-                style={{ maxWidth: 300, minWidth: 300, textAlign: "left" }}
-              >
-                {this.state.users.map(function (user) {
-                  return (
-                    <MenuItem key={user} value={user}>
-                      {user}
-                    </MenuItem>
-                  );
-                })}
-              </Select>
-            </FormControl>
-          </div>
           <div className="form-group">
             {/* <label>Description: </label>
             <input
@@ -257,7 +234,8 @@ class EditExercise extends Component {
                 label="Date"
                 type="date"
                 className="textField"
-                defaultValue={this.state.date}
+                // defaultValue={this.state.date}
+                value={this.state.date}
                 InputLabelProps={{
                   shrink: true,
                 }}
@@ -272,7 +250,6 @@ class EditExercise extends Component {
               value="Edit Exercise Log"
               className="btn btn-primary exercise-container-btn"
               disabled={
-                !this.state.username ||
                 this.state.description.length === 0 ||
                 !this.state.duration ||
                 !this.state.validMinutes

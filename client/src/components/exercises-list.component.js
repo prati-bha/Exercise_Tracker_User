@@ -10,6 +10,8 @@ import EditIcon from "@material-ui/icons/Edit";
 import "../App.css";
 import { Waypoint } from "react-waypoint";
 import Spinner from "./Spinner/Spinner";
+import { withRouter } from "react-router-dom";
+import { connect } from "react-redux";
 
 toast.configure();
 
@@ -54,7 +56,7 @@ const Exercise = (props) => (
   </tr>
 );
 
-export default class ExercisesList extends Component {
+class ExercisesList extends Component {
   constructor(props) {
     super(props);
 
@@ -78,15 +80,14 @@ export default class ExercisesList extends Component {
   }
 
   componentDidMount() {
+    console.log("STORE TOKEN", this.props);
     this.setState({
       loading: true,
     });
     axios
       .get(
         `${ENDPOINTS.EXERCISES}?pageNum=${this.state.pageNum}&limit=${this.state.limit}`,
-        {
-          headers: getToken,
-        }
+        { headers: { Authorization: `Bearer ${this.props.token}` } }
       )
       .then((response) => {
         this.setState({
@@ -95,9 +96,7 @@ export default class ExercisesList extends Component {
         });
         this.setState({ exercises: response.data });
       })
-      .catch((error) => {
-        console.log(error);
-      });
+      .catch((err) => this.notify(err));
   }
 
   deleteExercise(id) {
@@ -108,7 +107,8 @@ export default class ExercisesList extends Component {
       .then((response) => {
         this.notify("Exercise Deleted!");
         return console.log(response.data);
-      });
+      })
+      .catch((err) => this.notify(err));
 
     this.setState({
       exercises: this.state.exercises.filter((el) => el._id !== id),
@@ -176,3 +176,12 @@ export default class ExercisesList extends Component {
     );
   }
 }
+
+const mapStateToProps = (state) => {
+  return {
+    token: state.token,
+    username: state.username,
+  };
+};
+
+export default connect(mapStateToProps)(withRouter(ExercisesList));

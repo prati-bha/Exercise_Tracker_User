@@ -4,12 +4,14 @@ import validator from "validator";
 import axios from "axios";
 import { ENDPOINTS } from "../constant";
 import { toast } from "react-toastify";
+import { withRouter } from "react-router-dom";
 
 toast.configure();
 export class Signup extends Component {
   constructor(props) {
     super(props);
 
+    this.handleLogin = this.handleLogin.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
     this.onChangeName = this.onChangeName.bind(this);
     this.onChangeEmail = this.onChangeEmail.bind(this);
@@ -127,6 +129,11 @@ export class Signup extends Component {
     return toast.success(e, { position: toast.POSITION.TOP_RIGHT });
   }
 
+  handleLogin() {
+    const { history } = this.props;
+    history.push("/");
+  }
+
   onSubmit(e) {
     const { history } = this.props;
     e.preventDefault();
@@ -137,11 +144,27 @@ export class Signup extends Component {
     };
 
     // TODO add sign up api endpoint
-    axios.post(ENDPOINTS.SIGN_UP, user).then((res) => {
-      this.notify("Signed Up Successfully!");
-      history.push("/login");
-      return console.log(res.data);
-    });
+    axios
+      .post(ENDPOINTS.SIGN_UP, user)
+      .then((res) => {
+        this.notify("Signed Up Successfully!");
+        history.push("/");
+        return console.log(res.data);
+      })
+      .catch((err) => {
+        return this.setState({
+          email: "",
+          password: "",
+          confirmPassword: "",
+          error: false,
+          errorMessage: {
+            username: "",
+            email: "",
+          },
+          uniqueUsername: false,
+          matchPassword: true,
+        });
+      });
 
     this.setState({
       email: "",
@@ -222,10 +245,17 @@ export class Signup extends Component {
               }
             />
           </div>
+          <div className="form-group">
+            <a>Already have an account?</a>
+            <br></br>
+            <button className="btn btn-warning" onClick={this.handleLogin}>
+              Login
+            </button>
+          </div>
         </form>
       </div>
     );
   }
 }
 
-export default Signup;
+export default withRouter(Signup);

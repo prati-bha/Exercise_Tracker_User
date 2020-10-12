@@ -4,6 +4,10 @@ import validator from "validator";
 import axios from "axios";
 import { ENDPOINTS } from "../constant";
 import { toast } from "react-toastify";
+import { withRouter } from "react-router-dom";
+import * as actionTypes from "../store/actions";
+import { connect } from "react-redux";
+import Spinner from "./Spinner/Spinner";
 
 toast.configure();
 
@@ -11,6 +15,7 @@ export class Login extends Component {
   constructor(props) {
     super(props);
 
+    this.handleSignUp = this.handleSignUp.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
     this.onChangeEmail = this.onChangeEmail.bind(this);
     this.onChangePassword = this.onChangePassword.bind(this);
@@ -20,6 +25,9 @@ export class Login extends Component {
       password: "",
       errorMessage: "",
       error: false,
+      token: "",
+      username: "",
+      loading: false,
     };
   }
 
@@ -51,6 +59,9 @@ export class Login extends Component {
   }
 
   onSubmit(e) {
+    this.setState({
+      loading: true,
+    });
     const { history } = this.props;
     e.preventDefault();
 
@@ -60,22 +71,48 @@ export class Login extends Component {
     };
 
     // TODO add endpoint for login
-    axios.post(`${ENDPOINTS.LOGIN}`, user).then((response) => {
-      console.log('response', response.data)
-      localStorage.setItem("token", response.data.token);
-      if (response.data.user.username) {
-        localStorage.setItem("username", response.data.username);
-        this.notify("Logged In Successfully!");
-        history.push("/");
-      } else {
-        history.push("/user");
-      }
-    });
+    axios
+      .post(`${ENDPOINTS.LOGIN}`, user)
+      .then((response) => {
+        this.setState(
+          {
+            loading: false,
+            token: response.data.token,
+            username: response.data.user.username,
+          },
+          () => {
+            localStorage.setItem("token", response.data.token);
+            if (response.data.user.username) {
+              localStorage.setItem("username", response.data.user.username);
+              this.notify("Logged In Successfully!");
+            } else {
+              history.push("/user");
+            }
+          }
+        );
+        // setTimeout(() => {
+        history.push("/list");
+        // }, 5000);
+        this.props.dispatchSubmit({
+          token: this.state.token,
+          username: this.state.username,
+        });
+      })
+      .catch((err) => {
+        this.setState({
+          loading: false,
+        });
+        return this.notify(err);
+      });
   }
 
+  handleSignUp() {
+    const { history } = this.props;
+    history.push("/signUp");
+  }
   render() {
     return (
-      <div className="user-container">
+      <div className="exercise-container">
         <h3>Login</h3>
         <form onSubmit={this.onSubmit}>
           <div className="form-group">
@@ -113,10 +150,31 @@ export class Login extends Component {
               }
             />
           </div>
+          <div className="form-group">
+            <a>New to ExcerTracker?</a>
+            <br></br>
+            <button className="btn btn-warning" onClick={this.handleSignUp}>
+              Sign Up
+            </button>
+          </div>
         </form>
       </div>
     );
   }
 }
 
-export default Login;
+// const mapStateToProps = (state) => {
+//   return {
+//     token: state.token,
+//     username: state.username,
+//   };
+// };
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    dispatchSubmit: (payload) =>
+      dispatch({ type: actionTypes.LOGIN, payload: payload }),
+  };
+};
+
+export default connect(null, mapDispatchToProps)(withRouter(Login));

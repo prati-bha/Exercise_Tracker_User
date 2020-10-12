@@ -1,13 +1,16 @@
 import { Button, Menu, MenuItem } from "@material-ui/core";
 import React, { Component } from "react";
-import { Link } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import "../App.css";
 import { profile } from "../images";
+import axios from "axios";
+import { ENDPOINTS, getToken } from "../constant";
 
-export default class Navbar extends Component {
+class Navbar extends Component {
   constructor(props) {
     super(props);
 
+    this.handleLogout = this.handleLogout.bind(this);
     this.handleClick = this.handleClick.bind(this);
     this.handleClose = this.handleClose.bind(this);
 
@@ -25,16 +28,41 @@ export default class Navbar extends Component {
     this.setState({ setAnchorEl: "", anchorEl: false });
   };
 
+  handleLogout = () => {
+    const { history } = this.props;
+    localStorage.removeItem("token");
+    localStorage.removeItem("username");
+    axios
+      .get(`${ENDPOINTS.LOGOUT}`, { headers: getToken })
+      .then((response) => history.push("/"));
+  };
+
   render() {
+    const username =
+      localStorage.getItem("username") === null ? null : (
+        <li className="navbar-item">
+          <Link to="/user" className="nav-link">
+            Create User
+          </Link>
+        </li>
+      );
+    const logout =
+      localStorage.getItem("token") === null ? null : (
+        <li className="navbar-item">
+          <button className="btn btn-secondary" onClick={this.handleLogout}>
+            Logout
+          </button>
+        </li>
+      );
     return (
       <nav className="navbar navbar-dark bg-dark navbar-expand-lg">
-        <Link to="/" className="navbar-brand">
+        <Link to="/list" className="navbar-brand">
           ExcerTracker
         </Link>
         <div className="collpase navbar-collapse">
           <ul className="navbar-nav mr-auto">
             <li className="navbar-item">
-              <Link to="/" className="nav-link">
+              <Link to="/list" className="nav-link">
                 Exercises
               </Link>
             </li>
@@ -43,11 +71,8 @@ export default class Navbar extends Component {
                 Create Exercise Log
               </Link>
             </li>
-            <li className="navbar-item">
-              <Link to="/user" className="nav-link">
-                Create User
-              </Link>
-            </li>
+            {username}
+            {logout}
             {/* <li className="navbar-item">
               <Button
                 className="nav-btn"
@@ -75,3 +100,5 @@ export default class Navbar extends Component {
     );
   }
 }
+
+export default withRouter(Navbar);

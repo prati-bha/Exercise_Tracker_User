@@ -57,9 +57,7 @@ class CreateExercise extends Component {
           });
         }
       })
-      .catch((error) => {
-        console.log(error);
-      });
+      .catch((err) => this.notify(err));
   }
   onChangeUsername(e) {
     this.setState({
@@ -106,7 +104,7 @@ class CreateExercise extends Component {
     const { history } = this.props;
     e.preventDefault();
     const exercise = {
-      username: this.state.username,
+      username: localStorage.getItem("username"),
       description: this.state.description,
       duration: this.state.duration,
       date: this.state.date,
@@ -118,9 +116,10 @@ class CreateExercise extends Component {
       })
       .then((res) => {
         this.notify("Exercise Added!");
-        history.push("/");
+        history.push("/list");
         return console.log(res.data);
-      });
+      })
+      .catch((err) => this.notify(err));
   }
   render() {
     if (!this.state.hasUsername) {
@@ -131,7 +130,7 @@ class CreateExercise extends Component {
         <Modal show></Modal>
         <h3>Create New Exercise Log</h3>
         <form onSubmit={this.onSubmit}>
-          <div className="form-group">
+          {/* <div className="form-group">
             <FormControl variant="outlined">
               <InputLabel id="demo-simple-select-outlined-label">
                 Username
@@ -153,7 +152,7 @@ class CreateExercise extends Component {
                 })}
               </Select>
             </FormControl>
-          </div>
+          </div> */}
           <div className="form-group">
             {/* <label>Description: </label>
             <input
@@ -247,7 +246,6 @@ class CreateExercise extends Component {
               value="Create Exercise Log"
               className="btn btn-primary exercise-container-btn"
               disabled={
-                !this.state.username ||
                 this.state.description.length === 0 ||
                 !this.state.duration ||
                 !this.state.validMinutes ||

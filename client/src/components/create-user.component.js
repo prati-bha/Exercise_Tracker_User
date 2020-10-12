@@ -6,9 +6,10 @@ import { TextField } from "@material-ui/core";
 import { ENDPOINTS, getToken } from "../constant";
 import "../App.css";
 import validator from "validator";
+import { withRouter } from "react-router-dom";
 
 toast.configure();
-export default class CreateUser extends Component {
+class CreateUser extends Component {
   constructor(props) {
     super(props);
 
@@ -84,9 +85,11 @@ export default class CreateUser extends Component {
       })
       .then((res) => {
         this.notify("User Added!");
+        localStorage.setItem("username", user.username);
         history.push("/create");
         return console.log(res.data);
-      });
+      })
+      .catch((err) => this.notify(err));
 
     this.setState({
       username: "",
@@ -131,3 +134,5 @@ export default class CreateUser extends Component {
     );
   }
 }
+
+export default withRouter(CreateUser);
