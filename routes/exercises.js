@@ -4,7 +4,7 @@ const auth = require('../middlewares/auth')
 let User = require('../models/user.model');
 
 const checkUsername = (username) => {
-    if (username === undefined) {
+    if (username === null) {
         return false
     }
     return true

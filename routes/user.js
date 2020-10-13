@@ -137,4 +137,73 @@ router.post('/username', auth, (req, res) => {
 });
 /**Add Username Api */
 
+
+/**Edit Username Api */
+const checkUsername = (username) => {
+    if (username === null) {
+        return false
+    }
+    return true
+}
+
+const updateData = async (username, email, password, req, res) => {
+    await User.updateOne(req.user, { username, email, password }, (err, data) => {
+        if (err) {
+            err => res.status(400).json('Error: ' + err)
+        }
+        if (!err) {
+            res.status(200).send({
+                message: "Data updated"
+            })
+        }
+    })
+}
+router.post('/edit', auth, async (req, res) => {
+    const isUsernameAdded = checkUsername(req.user.username);
+    if (isUsernameAdded) {
+        const email = req.body.email || req.user.email;
+        const password = req.body.password || req.user.password;
+        let username = req.user.username;
+        try {
+            if (req.body.username && req.body.username.length > 8) {
+                res.status(400).send({
+                    message: "Allowed username's length is only 8"
+                })
+            } else if (req.body.username && !validate.isAlphanumeric(req.body.username, 'en-US')) {
+                res.status(400).send({
+                    message: "Allowed username's content should be alphanumeric only"
+                })
+            } else if (req.body.username) {
+                await User.find({ "username": { $regex: req.body.username, $options: 'i' } }).countDocuments((err, count) => {
+                    if (err) {
+                        res.status(500);
+                    }
+                    if (!err) {
+                        if (count === 0) {
+                            updateData(username, email, password, req, res)
+                        } else {
+                            res.status(405).send({
+                                message: "username already taken !"
+                            });
+                        }
+                    }
+                })
+            }
+            if (!req.body.username) {
+                updateData(username, email, password, req, res)
+            }
+        } catch (error) {
+            res.status(400).send({
+                message: error
+            })
+        }
+    } else {
+        res.status(400).send({
+            message: "Add Username First"
+        })
+    }
+
+});
+/**Edit Username Api */
+
 module.exports = router;
