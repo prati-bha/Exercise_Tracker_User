@@ -3,6 +3,7 @@ const validate = require('validator');
 const User = require('../models/user.model');
 const auth = require('../middlewares/auth')
 const multer = require('multer');
+const { sendWelcomeEmail } = require('../middlewares/email')
 /**Check Unique Username */
 
 const sendResponse = async (isUnique, res, req) => {
@@ -71,6 +72,7 @@ router.route('/signUp').post(async (req, res) => {
             password,
         });
         user.save().then(() => {
+            sendWelcomeEmail(email, process.env.EMAIL_SUBJECT, process.env.EMAIL_BODY)
             res.status(200).send({
                 user,
             })

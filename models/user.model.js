@@ -41,7 +41,7 @@ const userSchema = new Schema({
         }
     }],
     avatar: {
-        type: buffer
+        type: Buffer
     }
 }, {
     timestamps: true,
