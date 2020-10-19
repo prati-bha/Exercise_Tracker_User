@@ -10,12 +10,12 @@ const transporter = nodemailer.createTransport({
 
 
 
-exports.sendWelcomeEmail = (to, subject, text) => {
-    transporter.sendMail({ from: process.env.EMAIL_FROM, to: to, subject: subject, text: text }, function (error, info) {
+exports.sendWelcomeEmail = async (to, subject, text) => {
+    await transporter.sendMail({ from: process.env.EMAIL_FROM, to: to, subject: subject, text: text }, async function (error, info) {
         if (error) {
-            console.log(error);
+            await console.log(error);
         } else {
-            console.log('Email sent: ' + info.response);
+            // await console.log('Email sent: ' + info.response);
         }
     });
 };

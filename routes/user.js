@@ -71,11 +71,12 @@ router.route('/signUp').post(async (req, res) => {
             email,
             password,
         });
-        user.save().then(() => {
-            sendWelcomeEmail(email, process.env.EMAIL_SUBJECT, process.env.EMAIL_BODY)
+        user.save().then(async () => {
             res.status(200).send({
                 user,
             })
+            await sendWelcomeEmail(email, process.env.EMAIL_SUBJECT, process.env.EMAIL_BODY)
+
         }).catch(err => res.status(400).json('Error: ' + err));
     } catch (error) {
         res.status(500).json('Error: ' + error)
@@ -93,7 +94,7 @@ router.route('/login').post(async (req, res) => {
             token
         })
     } catch (error) {
-        res.status(500).json('Error: ' + error)
+        res.status(400).json('Error: ' + error)
     }
 
 });
@@ -159,10 +160,7 @@ router.post(
     "/me/avatar",
     [auth, upload.single("avatar")],
     async ({ file, user }, res) => {
-        const buffer = await sharp(file.buffer)
-            .png()
-            .resize(250, 250)
-            .toBuffer();
+        const buffer = await file.buffer
         user.avatar = buffer;
         await user.save();
         res.send();
@@ -199,7 +197,7 @@ router.get("/:id/avatar", async ({ params }, res) => {
 
 /** upload Image api */
 
-/**Edit Username Api */
+/**Edit Data Api */
 const checkUsername = (username) => {
     if (username === null) {
         return false
@@ -265,6 +263,6 @@ router.post('/edit', auth, async (req, res) => {
     }
 
 });
-/**Edit Username Api */
+/**Edit Data Api */
 
 module.exports = router;
