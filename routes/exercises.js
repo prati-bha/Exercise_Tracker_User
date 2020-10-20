@@ -4,7 +4,7 @@ const auth = require('../middlewares/auth')
 let User = require('../models/user.model');
 
 const checkUsername = (username) => {
-    if (username === null) {
+    if (username === null || username === undefined) {
         return false
     }
     return true
@@ -108,16 +108,23 @@ router.delete('/:id', auth, (req, res) => {
 router.post('/update/:id', auth, (req, res) => {
     const isUsernameAdded = checkUsername(req.user.username);
     if (isUsernameAdded) {
-        Exercise.findById(req.params.id)
-            .then(exercise => {
-                req.body.description && (exercise.description = req.body.description);
-                req.body.duration && (exercise.duration = Number(req.body.duration));
-                req.body.date && (exercise.date = Date.parse(req.body.date));
-                exercise.save()
-                    .then(() => res.json('Exercise updated!'))
-                    .catch(err => res.status(400).json('Error: ' + err));
-            })
-            .catch(err => res.status(400).json('Error: ' + err));
+        Exercise.findOne({ username: req.user.username, _id: req.params.id }, function (err, exercise) {
+
+            if (err) {
+                res.status(400).json('Error: ' + err);
+            } else {
+                req.body.description && (exercise.description = req.body.description),
+                    req.body.duration && (exercise.duration = Number(req.body.duration)),
+                    req.body.date && (exercise.date = Date.parse(req.body.date))
+                exercise.save(function (err) {
+                    if (err) {
+                        console.error('ERROR!');
+                    } else {
+                        res.json('Exercise updated!')
+                    }
+                });
+            }
+        })
     } else {
         res.status(400).send({
             message: "Add Username First"
