@@ -3,24 +3,33 @@
   "version": "1.0.0",
   "description": "exercise tracker app with mern stack",
   "main": "server.js",
+  "jest": {
+    "testEnvironment": "node"
+  },
   "dependencies": {
+    "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "jest": "^26.5.3",
+    "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.10.7",
+    "multer": "^1.4.2",
+    "nodemailer": "^6.4.14",
     "nodemon": "^2.0.4",
+    "supertest": "^5.0.0",
     "validator": "^13.1.17"
   },
   "devDependencies": {
     "jshint": "^2.12.0"
   },
   "scripts": {
-    "test": "echo \"no test specified\" && exit 1",
+    "test": "jest --coverage   --watch",
     "build": "cd client && npm run build",
     "install-client": "cd client && npm install",
     "heroku-postbuild": "npm run install-client && npm run build",
-    "start": "node server.js"
+    "start": "nodemon server.js"
   },
   "engines": {
     "node": "12.x",
